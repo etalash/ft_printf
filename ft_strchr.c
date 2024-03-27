@@ -1,30 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putstr.c                                        :+:      :+:    :+:   */
+/*   ft_strchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: stalash <stalash@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/27 15:08:34 by stalash           #+#    #+#             */
-/*   Updated: 2024/03/27 15:08:34 by stalash          ###   ########.fr       */
+/*   Created: 2024/03/27 12:15:34 by stalash           #+#    #+#             */
+/*   Updated: 2024/03/27 12:15:34 by stalash          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftprintf.h"
 
-size_t	ft_strlen(char const *str)
+char	*ft_strchr(const char *s, int c)
 {
-	size_t	i;
+	int		i;
+	char	ch;
 
 	i = 0;
-	while (*(str + i))
-		i++;
-	return (i);
-}
-
-int	ft_putstr(char const *s)
-{
-	if (!s)
-		return (write(1, "(null)", 6));
-	return (write(1, s, ft_strlen(s)));
+	ch = (char)c;
+	while (s[i])
+	{
+		if (ch == s[i])
+			break ;
+		s++;
+	}
+	if (ch == s[i])
+		return ((char *)(s + i));
+	else
+		return (0);
 }

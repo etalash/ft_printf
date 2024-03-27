@@ -5,62 +5,88 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: stalash <stalash@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/23 12:15:13 by stalash           #+#    #+#             */
-/*   Updated: 2024/03/25 18:36:49 by stalash          ###   ########.fr       */
+/*   Created: 2024/03/27 12:40:00 by stalash           #+#    #+#             */
+/*   Updated: 2024/03/27 12:40:00 by stalash          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftprintf.h"
 
-int	convert_format(char spicifier, va_list ap)
+static int	ft_format(va_list args, const char format)
 {
 	int	count;
 
 	count = 0;
-	if (spicifier == '%')
-		count += ft_putchar('%');
-	else if (spicifier == 'c')
-		count += ft_putchar(va_arg(ap, int));
-	else if (spicifier == 's')
-	{
-		char	*str;
-
-		str = va_arg(ap, char *);
-		if (str)
-			count += ft_putstr(str);
-		else
-			count += ft_putstr("(null)");
-	}
-	else if (spicifier == 'd' || spicifier == 'i')
-		count += print_digit((long)(va_arg(ap, int)), 10, 0);
-	else if (spicifier == 'u')
-		count += print_digit((unsigned long)(va_arg(ap, unsigned int)), 10, 0);
-	else if (spicifier == 'p')
-		count += print_pointer(va_arg(ap, void *));
-	else if (spicifier == 'x')
-		count += print_digit(va_arg(ap, unsigned long), 16, 0);
-	else if (spicifier == 'X')
-		count += print_digit(va_arg(ap, unsigned long), 16, 1);
-	else
-		count += write(1, &spicifier, 1);
+	if (format == 'c')
+		count += (ft_putchar((va_arg(args, int))));
+	else if (format == 's')
+		count += (ft_putstr((va_arg(args, char *))));
+	else if (format == 'd' || format == 'i')
+		count += (ft_putnbr((va_arg(args, int)), 10, 0));
+	else if (format == 'x')
+		count += (ft_putnbr(va_arg(args, unsigned int), 16, 0));
+	else if (format == 'X')
+		count += (ft_putnbr(va_arg(args, unsigned int), 16, 1));
+	else if (format == 'p')
+		count += (print_pointer(va_arg(args, void *)));
+	else if (format == 'u')
+		count += (ft_putnbr(va_arg(args, unsigned int), 10, 0));
+	else if (format == '%')
+		count += (ft_putchar('%'));
 	return (count);
 }
 
-int	ft_printf(const char *format, ...)
-{
-	int		count;
-	va_list	ap;
+// int	ft_printf(const char *str, ...)
+// {
+// 	va_list	args;
+// 	int		i;
+// 	int		length;
 
-	va_start(ap, format);
-	count = 0;
-	while (*format != '\0')
+// 	i = 0;
+// 	length = 0;
+// 	va_start(args, str);
+// 	while (*(str + i))
+// 	{
+// 		if ((*(str + i) == '%') && (ft_strchr("cspdiuxX%", *(str + i + 1))))
+// 		{
+// 			length += ft_format(args, *(str + i + 1));
+// 			i++;
+// 		}
+// 		else
+// 			length += ft_putchar(*(str + i));
+// 		i++;
+// 	}
+// 	va_end(args);
+// 	return (length);
+// }
+int	ft_printf(const char *str, ...)
+{
+	va_list	args;
+	int		i;
+	int		length;
+
+	i = 0;
+	length = 0;
+	va_start(args, str);
+	while (*(str + i))
 	{
-		if (*format == '%')
-			count += convert_format(*(++format), ap);
+		if ((*(str + i) == '%') && (ft_strchr("cspdiuxX%", *(str + i + 1))))
+		{
+			int ret = ft_format(args, *(str + i + 1));
+			if (ret == -1)
+				return (-1); // Return -1 immediately if an error occurs
+			length += ret;
+			i++;
+		}
 		else
-			count += write(1, format, 1);
-		format++;
+		{
+			int ret = ft_putchar(*(str + i));
+			if (ret == -1)
+				return (-1); // Return -1 immediately if an error occurs
+			length += ret;
+		}
+		i++;
 	}
-	va_end(ap);
-	return (count);
+	va_end(args);
+	return (length);
 }

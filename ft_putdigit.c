@@ -10,57 +10,44 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftprintf.h"
+#include "ft_printf.h"
 
-// int	print_hexa(unsigned long long val, int base, char *str)
-// {
-// 	int	count;
-
-// 	count = 0;
-// 	if (val >= (unsigned long long)base)
-// 		count += print_hexa((val / base), base, str);
-// 	if (write(1, &str[val % base], 1) == -1)
-// 		return (-1);
-// 	return (count + 1);
-// }
-
-int	print_hexa(unsigned long long val, int base, char *str)
+static int	print_hexa(unsigned long long val, int base, char *str)
 {
 	int	count;
+	int	check;
 
 	count = 0;
 	if (val >= (unsigned long long)base)
-		count += print_hexa((val / base), base, str);
+	{
+		check = print_hexa((val / base), base, str);
+		if (check == -1)
+			return (-1);
+		count += check;
+	}
 	if (write(1, &str[val % base], 1) == -1)
-		return (-1); // Return -1 if write fails
+		return (-1);
 	return (count + 1);
 }
 
-int	ft_putnbr(long long nb, int base, int upercase)
+int	ft_putnbr(long long nb, int base, int uppercase)
 {
 	int		count;
 	char	*symbol;
 
 	count = 0;
-	if (upercase == 1)
+	if (uppercase == 1)
 		symbol = "0123456789ABCDEF";
 	else
 		symbol = "0123456789abcdef";
-	if (nb < 0 && base == 10)
+	if (nb < 0)
 	{
-		// count += ft_putchar('-');
 		if (ft_putchar('-') == -1)
 			return (-1);
 		nb = -nb;
 		count++;
 	}
 	return (count += print_hexa(nb, base, symbol));
-	// if (nb < (unsigned long long)base)
-	// 	return (ft_putchar(symbol[nb]));
-	// count += ft_putnbr(nb / base, base, upercase);
-	// if (count == -1)
-	// 	return (-1);
-	// return (count += ft_putnbr(nb % base, base, upercase));
 }
 
 int	print_pointer(void *ptr)
@@ -68,6 +55,7 @@ int	print_pointer(void *ptr)
 	char				*symbol;
 	unsigned long long	int_val;
 	int					count;
+	int					check;
 
 	symbol = "0123456789abcdef";
 	int_val = (unsigned long long)ptr;
@@ -81,6 +69,8 @@ int	print_pointer(void *ptr)
 			return (-1);
 		return (count + 1);
 	}
-	else
-		return (count += print_hexa(int_val, 16, symbol));
+	check = print_hexa(int_val, 16, symbol);
+	if (check == -1)
+		return (-1);
+	return (count + check);
 }

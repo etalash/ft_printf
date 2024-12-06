@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftprintf.h"
+#include "ft_printf.h"
 
 static int	ft_format(va_list args, const char format)
 {
@@ -36,54 +36,45 @@ static int	ft_format(va_list args, const char format)
 	return (count);
 }
 
-// int	ft_printf(const char *str, ...)
-// {
-// 	va_list	args;
-// 	int		i;
-// 	int		length;
+static int	process_format(va_list args, const char *str, int *i, int *length)
+{
+	int	check;
 
-// 	i = 0;
-// 	length = 0;
-// 	va_start(args, str);
-// 	while (*(str + i))
-// 	{
-// 		if ((*(str + i) == '%') && (ft_strchr("cspdiuxX%", *(str + i + 1))))
-// 		{
-// 			length += ft_format(args, *(str + i + 1));
-// 			i++;
-// 		}
-// 		else
-// 			length += ft_putchar(*(str + i));
-// 		i++;
-// 	}
-// 	va_end(args);
-// 	return (length);
-// }
+	if ((str[*i] == '%') && (ft_strchr("cspdiuxX%", str[*i + 1])))
+	{
+		check = ft_format(args, str[*i + 1]);
+		if (check == -1)
+			return (-1);
+		*length += check;
+		(*i)++;
+	}
+	else
+	{
+		check = ft_putchar(str[*i]);
+		if (check == -1)
+			return (-1);
+		*length += check;
+	}
+	return (0);
+}
+
 int	ft_printf(const char *str, ...)
 {
 	va_list	args;
 	int		i;
 	int		length;
+	int		check;
 
 	i = 0;
 	length = 0;
 	va_start(args, str);
-	while (*(str + i))
+	while (str[i])
 	{
-		if ((*(str + i) == '%') && (ft_strchr("cspdiuxX%", *(str + i + 1))))
+		check = process_format(args, str, &i, &length);
+		if (check == -1)
 		{
-			int ret = ft_format(args, *(str + i + 1));
-			if (ret == -1)
-				return (-1); // Return -1 immediately if an error occurs
-			length += ret;
-			i++;
-		}
-		else
-		{
-			int ret = ft_putchar(*(str + i));
-			if (ret == -1)
-				return (-1); // Return -1 immediately if an error occurs
-			length += ret;
+			va_end(args);
+			return (-1);
 		}
 		i++;
 	}
